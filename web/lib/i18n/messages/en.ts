@@ -36,6 +36,10 @@ export const en = {
     subtitle: "Continue with your preferred account",
     continueWithGithub: "Continue with GitHub",
     continueWithGoogle: "Continue with Google",
+    guestHeading: "Quick access",
+    guestNameLabel: "Your name",
+    guestNamePlaceholder: "Your name (optional)",
+    guestButton: "Continue as guest",
     errors: {
       OAuthAccountNotLinked:
         "An account with this email already exists with a different sign-in method. Try signing in with your original provider.",

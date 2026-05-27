@@ -39,6 +39,10 @@ export const id: typeof en = {
     subtitle: "Lanjutkan dengan akun pilihan Anda",
     continueWithGithub: "Lanjutkan dengan GitHub",
     continueWithGoogle: "Lanjutkan dengan Google",
+    guestHeading: "Akses cepat",
+    guestNameLabel: "Nama Anda",
+    guestNamePlaceholder: "Nama Anda (opsional)",
+    guestButton: "Lanjut sebagai tamu",
     errors: {
       OAuthAccountNotLinked:
         "Akun dengan email ini sudah terdaftar lewat metode masuk yang berbeda. Coba masuk dengan penyedia yang Anda pakai sebelumnya.",

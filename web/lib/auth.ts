@@ -48,6 +48,38 @@ if (process.env.E2E_TEST_MODE === "1") {
   );
 }
 
+// TEMPORARY open-access guest login. UNLIKE the E2E backdoor above, this is
+// *allowed in production* — it exists so anyone can get into the dashboard
+// while Google OAuth is being set up. It is gated behind its own explicit
+// env flag so it is OFF by default and trivially reversible: remove
+// ALLOW_GUEST_LOGIN from the environment and the provider (and the /login
+// button) disappear on the next restart. SECURITY: while enabled, anyone who
+// reaches the URL can sign in and spend LLM credits. Turn it off once real
+// OAuth works.
+if (process.env.ALLOW_GUEST_LOGIN === "1") {
+  providers.push(
+    Credentials({
+      id: "guest",
+      name: "Guest",
+      credentials: { name: { label: "Name" } },
+      async authorize(c) {
+        const raw = typeof c?.name === "string" ? c.name.trim() : "";
+        // A typed name → a stable personal space (own watchlist/runs).
+        // Blank → a throwaway guest id so two anonymous guests don't collide.
+        const slug = raw
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 32);
+        const id = slug
+          ? `guest-${slug}`
+          : `guest-${globalThis.crypto.randomUUID().slice(0, 8)}`;
+        return { id, email: `${id}@guest.local`, name: raw || "Guest" };
+      },
+    })
+  );
+}
+
 export const authConfig: NextAuthConfig = {
   providers,
   session: { strategy: "jwt" },
@@ -67,6 +99,10 @@ export const authConfig: NextAuthConfig = {
         token.sub = String(p.id);
         if (p.email) token.email = p.email;
         (token as { provider?: string }).provider = "github";
+      } else if (account?.provider === "guest" && user) {
+        token.sub = String(user.id);
+        if (user.email) token.email = user.email;
+        (token as { provider?: string }).provider = "guest";
       } else if (user && process.env.E2E_TEST_MODE === "1") {
         token.sub = String(user.id);
         if (user.email) token.email = user.email;

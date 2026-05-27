@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import SignInForm from "./SignInForm";
 import E2ESignIn from "./E2ESignIn";
+import GuestSignIn from "./GuestSignIn";
 import { getT } from "@/lib/i18n/server";
 import LanguageToggle from "@/components/LanguageToggle";
 
@@ -50,6 +51,9 @@ export default async function LoginPage({ searchParams }: PageProps) {
           {t("login.subtitle")}
         </p>
         <SignInForm callbackUrl={isSafeRedirect(callbackUrl) ? callbackUrl : undefined} error={error} />
+        {process.env.ALLOW_GUEST_LOGIN === "1" && (
+          <GuestSignIn callbackUrl={isSafeRedirect(callbackUrl) ? callbackUrl : undefined} />
+        )}
         {process.env.E2E_TEST_MODE === "1" && (
           <E2ESignIn callbackUrl={isSafeRedirect(callbackUrl) ? callbackUrl : undefined} />
         )}
