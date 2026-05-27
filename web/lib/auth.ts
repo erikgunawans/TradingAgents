@@ -2,6 +2,7 @@ import NextAuth, { type NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
+import { envFlag } from "@/lib/env";
 
 const secret = process.env.NEXTAUTH_SECRET;
 // The secret is only ever used server-side (JWT signing in bearer()/NextAuth).
@@ -56,7 +57,7 @@ if (process.env.E2E_TEST_MODE === "1") {
 // button) disappear on the next restart. SECURITY: while enabled, anyone who
 // reaches the URL can sign in and spend LLM credits. Turn it off once real
 // OAuth works.
-if (process.env.ALLOW_GUEST_LOGIN === "1") {
+if (envFlag(process.env.ALLOW_GUEST_LOGIN)) {
   providers.push(
     Credentials({
       id: "guest",

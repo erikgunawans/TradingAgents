@@ -5,6 +5,7 @@ import SignInForm from "./SignInForm";
 import E2ESignIn from "./E2ESignIn";
 import GuestSignIn from "./GuestSignIn";
 import { getT } from "@/lib/i18n/server";
+import { envFlag } from "@/lib/env";
 import LanguageToggle from "@/components/LanguageToggle";
 
 export const metadata = {
@@ -51,7 +52,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
           {t("login.subtitle")}
         </p>
         <SignInForm callbackUrl={isSafeRedirect(callbackUrl) ? callbackUrl : undefined} error={error} />
-        {process.env.ALLOW_GUEST_LOGIN === "1" && (
+        {envFlag(process.env.ALLOW_GUEST_LOGIN) && (
           <GuestSignIn callbackUrl={isSafeRedirect(callbackUrl) ? callbackUrl : undefined} />
         )}
         {process.env.E2E_TEST_MODE === "1" && (
