@@ -2,6 +2,7 @@
 import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
+import { getT } from "@/lib/i18n/server";
 import Nav from "@/components/Nav";
 import TickerChartWorkspace from "@/components/TickerChartWorkspace";
 import DecisionTimeline from "@/components/DecisionTimeline";
@@ -15,6 +16,7 @@ interface PageProps {
 export default async function TickerPage({ params, searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user) redirect("/api/auth/signin");
+  const t = await getT();
 
   const { ticker } = await params;
   const { interval: rawInterval } = await searchParams;
@@ -37,7 +39,7 @@ export default async function TickerPage({ params, searchParams }: PageProps) {
             {detail.ticker}
           </h1>
           <span className="text-sm text-fg-muted">
-            {detail.decisions.length} decision{detail.decisions.length === 1 ? "" : "s"}
+            {t("ticker.decisionCount", { count: detail.decisions.length })}
           </span>
         </header>
 
@@ -52,7 +54,7 @@ export default async function TickerPage({ params, searchParams }: PageProps) {
 
           <div>
             <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.18em] text-fg-muted">
-              Decisions
+              {t("ticker.decisionsHeading")}
             </h2>
             <DecisionTimeline decisions={detail.decisions} />
           </div>

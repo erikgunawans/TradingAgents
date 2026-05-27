@@ -1,6 +1,7 @@
 import { TrendingUp, Target, Activity, ArrowDownToLine, Hash } from "lucide-react";
 import type { PortfolioSummaryOut } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { getT } from "@/lib/i18n/server";
 
 function pct(x: number) {
   return `${(x * 100).toFixed(2)}%`;
@@ -44,19 +45,20 @@ function StatCard({
   );
 }
 
-export default function PortfolioStats({
+export default async function PortfolioStats({
   summary,
 }: {
   summary: PortfolioSummaryOut;
 }) {
+  const t = await getT();
   const pnlTone = summary.cumulative_pnl > 0 ? "positive" : summary.cumulative_pnl < 0 ? "negative" : "neutral";
   return (
     <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5 animate-fade-in">
-      <StatCard label="Cumulative P&L" value={pct(summary.cumulative_pnl)} Icon={TrendingUp} tone={pnlTone} />
-      <StatCard label="Win rate" value={pct(summary.win_rate)} Icon={Target} />
-      <StatCard label="Sharpe" value={summary.sharpe.toFixed(2)} Icon={Activity} />
-      <StatCard label="Max drawdown" value={pct(summary.max_drawdown)} Icon={ArrowDownToLine} tone={summary.max_drawdown < 0 ? "negative" : "neutral"} />
-      <StatCard label="Trades" value={String(summary.trade_count)} Icon={Hash} />
+      <StatCard label={t("portfolio.stats.cumulativePnl")} value={pct(summary.cumulative_pnl)} Icon={TrendingUp} tone={pnlTone} />
+      <StatCard label={t("portfolio.stats.winRate")} value={pct(summary.win_rate)} Icon={Target} />
+      <StatCard label={t("portfolio.stats.sharpe")} value={summary.sharpe.toFixed(2)} Icon={Activity} />
+      <StatCard label={t("portfolio.stats.maxDrawdown")} value={pct(summary.max_drawdown)} Icon={ArrowDownToLine} tone={summary.max_drawdown < 0 ? "negative" : "neutral"} />
+      <StatCard label={t("portfolio.stats.trades")} value={String(summary.trade_count)} Icon={Hash} />
     </div>
   );
 }

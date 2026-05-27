@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { updateNotificationsAction } from "@/app/actions";
 import { enableDisabledReason, thresholdLabel } from "./notification-copy";
+import { useT } from "@/lib/i18n/client";
 
 type NotifyState = {
   enabled: boolean;
@@ -19,6 +20,7 @@ export default function NotificationSection({
   initial: NotifyState;
   hasEmail: boolean;
 }) {
+  const t = useT();
   const [state, setState] = useState<NotifyState>(initial);
   const [error, setError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -30,7 +32,7 @@ export default function NotificationSection({
       if (!r.ok) throw new Error(r.message);
       setState(r.data);
     } catch (e) {
-      setError("Couldn't enable alerts.");
+      setError(t("notifications.enableFailed"));
       console.error("notifications enable failed", e);
     }
   }
@@ -62,13 +64,13 @@ export default function NotificationSection({
 
   // STATE A — alerts off
   if (!state.enabled) {
-    const blocked = enableDisabledReason(hasEmail);
+    const blocked = enableDisabledReason(hasEmail, t("notifications.addEmailReason"));
     return (
       <div className="rounded-xl border border-border/60 bg-surface/40 p-4 backdrop-blur-sm">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <Bell className="h-4 w-4 text-fg-subtle" aria-hidden />
-            <span className="text-sm font-medium text-fg">Signal alerts</span>
+            <span className="text-sm font-medium text-fg">{t("notifications.title")}</span>
           </div>
           <button
             type="button"
@@ -77,11 +79,11 @@ export default function NotificationSection({
             title={blocked ?? undefined}
             className="inline-flex h-8 items-center rounded-lg border border-brand/60 bg-brand/10 px-3 text-xs font-medium text-brand transition-colors hover:bg-brand/15 disabled:opacity-50"
           >
-            Enable alerts
+            {t("notifications.enable")}
           </button>
         </div>
         <p className="mt-1.5 text-xs text-fg-muted">
-          {blocked ?? "Get an email when an actionable signal lands — silent on all-HOLD days."}
+          {blocked ?? t("notifications.descOff")}
         </p>
       </div>
     );
@@ -93,34 +95,39 @@ export default function NotificationSection({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <Bell className="h-4 w-4 text-brand" aria-hidden />
-          <span className="text-sm font-medium text-fg">Signal alerts on</span>
+          <span className="text-sm font-medium text-fg">{t("notifications.titleOn")}</span>
         </div>
         <button
           type="button"
           onClick={onDisable}
           className="h-8 rounded-lg border border-border/60 bg-surface/40 px-3 text-xs text-fg-muted hover:text-fg"
         >
-          Disable alerts
+          {t("notifications.disable")}
         </button>
       </div>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
         <label className="flex flex-col gap-1 text-xs text-fg-subtle">
-          Alert on ratings
+          {t("notifications.alertOnRatings")}
           <input
             type="text"
             value={state.threshold}
             onChange={(e) => onThreshold(e.target.value)}
-            aria-label="Alert ratings"
+            aria-label={t("notifications.alertRatingsAria")}
             className="h-9 w-40 rounded-lg border border-border/60 bg-surface/40 px-2 font-mono text-sm text-fg focus:border-brand/60 focus:outline-none"
           />
         </label>
       </div>
       <p className="mt-2 text-xs text-fg-muted">
-        We&apos;ll email you when a {thresholdLabel(state.threshold)} signal lands. Quiet on days with nothing actionable.
+        {t("notifications.descOn", {
+          label: thresholdLabel(state.threshold, {
+            actionable: t("notifications.thresholdActionable"),
+            joiner: t("notifications.thresholdJoiner"),
+          }),
+        })}
       </p>
       {!state.deliverable && (
         <p className="mt-1 text-xs text-danger" role="alert">
-          No email on your account — alerts can&apos;t be delivered until you add one.
+          {t("notifications.noEmail")}
         </p>
       )}
       {error && <p className="mt-1 text-xs text-danger" role="alert">{error}</p>}

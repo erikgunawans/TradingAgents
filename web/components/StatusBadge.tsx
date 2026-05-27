@@ -1,35 +1,35 @@
+"use client";
+
 import { Loader2 } from "lucide-react";
 import type { RunStatus } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/client";
 
 const VARIANTS: Record<
   RunStatus,
-  { label: string; dot: string; text: string; animate?: boolean }
+  { dot: string; text: string; animate?: boolean }
 > = {
   queued: {
-    label: "Queued",
     dot: "bg-info",
     text: "text-info",
   },
   running: {
-    label: "Running",
     dot: "bg-warning",
     text: "text-warning",
     animate: true,
   },
   succeeded: {
-    label: "Succeeded",
     dot: "bg-success",
     text: "text-success",
   },
   failed: {
-    label: "Failed",
     dot: "bg-danger",
     text: "text-danger",
   },
 };
 
 export default function StatusBadge({ status }: { status: RunStatus }) {
+  const t = useT();
   const v = VARIANTS[status];
   return (
     <span
@@ -46,7 +46,7 @@ export default function StatusBadge({ status }: { status: RunStatus }) {
           aria-hidden
         />
       )}
-      {v.label}
+      {t(`status.${status}`)}
     </span>
   );
 }

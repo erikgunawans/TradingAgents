@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, AlertCircle, Activity } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getT } from "@/lib/i18n/server";
 import Nav from "@/components/Nav";
 import RatingBadge from "@/components/RatingBadge";
 import StatusBadge from "@/components/StatusBadge";
@@ -15,6 +16,7 @@ export default async function RunDetailPage({
 }) {
   const session = await auth();
   if (!session?.user) redirect("/api/auth/signin");
+  const t = await getT();
   const { runId } = await params;
   let run;
   try {
@@ -31,7 +33,7 @@ export default async function RunDetailPage({
           className="mb-4 inline-flex items-center gap-1 text-sm text-fg-muted transition-colors hover:text-fg"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to history
+          {t("runDetail.backToHistory")}
         </Link>
 
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
@@ -52,7 +54,7 @@ export default async function RunDetailPage({
                 className="inline-flex h-7 items-center gap-1.5 rounded-md bg-elevated px-2.5 text-xs font-medium text-fg transition-colors hover:bg-elevated/80"
               >
                 <Activity className="h-3 w-3" aria-hidden />
-                Watch live
+                {t("runDetail.watchLive")}
               </Link>
             )}
           </div>
@@ -65,7 +67,7 @@ export default async function RunDetailPage({
           >
             <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger" aria-hidden />
             <div className="min-w-0">
-              <div className="font-semibold text-danger">Error</div>
+              <div className="font-semibold text-danger">{t("common.error")}</div>
               <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-xs text-fg-muted">
                 {run.error_summary}
               </pre>

@@ -4,6 +4,7 @@ import { Activity, PlayCircle } from "lucide-react";
 // Link is still used for the page-header action + EmptyState action below.
 import { auth } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getT } from "@/lib/i18n/server";
 import Nav from "@/components/Nav";
 import PageHeader from "@/components/PageHeader";
 import RunCard from "@/components/RunCard";
@@ -12,6 +13,7 @@ import EmptyState from "@/components/EmptyState";
 export default async function LivePage() {
   const session = await auth();
   if (!session?.user) redirect("/api/auth/signin");
+  const t = await getT();
   const { items } = await api.listRuns();
   const active = items.filter((r) => r.status === "queued" || r.status === "running");
   const recent = items
@@ -23,16 +25,16 @@ export default async function LivePage() {
       <Nav />
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <PageHeader
-          eyebrow="Real-time"
-          title="Live runs"
-          description="Active analyses + the last 10 completions."
+          eyebrow={t("live.eyebrow")}
+          title={t("live.title")}
+          description={t("live.description")}
           actions={
             <Link
               href="/launch"
               className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border/60 bg-surface/60 px-3.5 text-[13px] font-medium text-fg backdrop-blur-sm transition-colors hover:border-border hover:bg-elevated"
             >
               <PlayCircle className="h-4 w-4 text-brand" aria-hidden />
-              New analysis
+              {t("common.newAnalysis")}
             </Link>
           }
         />
@@ -41,7 +43,7 @@ export default async function LivePage() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-fg-muted">
               <span className="inline-block h-2 w-2 animate-pulse-soft rounded-full bg-success" aria-hidden />
-              Active
+              {t("live.active")}
               <span className="rounded-full bg-elevated px-2 py-0.5 text-xs font-medium text-fg-muted normal-case tracking-normal">
                 {active.length}
               </span>
@@ -50,15 +52,15 @@ export default async function LivePage() {
           {active.length === 0 ? (
             <EmptyState
               icon={Activity}
-              title="Nothing running"
-              description="Launch an analysis to watch it stream here in real time."
+              title={t("live.emptyTitle")}
+              description={t("live.emptyDesc")}
               action={
                 <Link
                   href="/launch"
                   className="inline-flex h-9 items-center gap-1.5 rounded-md bg-brand px-4 text-sm font-medium text-brand-fg transition-colors hover:bg-brand/90"
                 >
                   <PlayCircle className="h-4 w-4" aria-hidden />
-                  Launch analysis
+                  {t("common.launchAnalysis")}
                 </Link>
               }
             />
@@ -79,7 +81,7 @@ export default async function LivePage() {
         {recent.length > 0 && (
           <section>
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-fg-muted">
-              Recent
+              {t("live.recent")}
             </h2>
             <div className="flex flex-col gap-2 animate-fade-in">
               {recent.map((r) => (

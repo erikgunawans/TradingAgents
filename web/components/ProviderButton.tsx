@@ -2,6 +2,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useT } from "@/lib/i18n/client";
 
 type Provider = "github" | "google";
 
@@ -11,9 +12,9 @@ interface Props {
   disabled?: boolean;
 }
 
-const LABEL: Record<Provider, string> = {
-  github: "Continue with GitHub",
-  google: "Continue with Google",
+const LABEL_KEY: Record<Provider, "login.continueWithGithub" | "login.continueWithGoogle"> = {
+  github: "login.continueWithGithub",
+  google: "login.continueWithGoogle",
 };
 
 const Icon = ({ provider }: { provider: Provider }) => {
@@ -35,6 +36,7 @@ const Icon = ({ provider }: { provider: Provider }) => {
 };
 
 export default function ProviderButton({ provider, callbackUrl = "/history", disabled = false }: Props) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -43,7 +45,7 @@ export default function ProviderButton({ provider, callbackUrl = "/history", dis
       className="flex w-full items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.04] px-3.5 py-2.5 text-sm font-medium text-fg-primary transition hover:bg-white/[0.07] hover:border-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <Icon provider={provider} />
-      <span>{LABEL[provider]}</span>
+      <span>{t(LABEL_KEY[provider])}</span>
     </button>
   );
 }

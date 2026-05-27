@@ -3,18 +3,19 @@ import { ChevronRight, Sparkles } from "lucide-react";
 import type { RunOut } from "@/lib/types";
 import RatingBadge from "./RatingBadge";
 import StatusBadge from "./StatusBadge";
+import { getT } from "@/lib/i18n/server";
 
-function formatRelative(iso: string): string {
+function relativeParts(iso: string): { value: number; unitKey: "s" | "m" | "h" | "d" } {
   const ts = new Date(iso).getTime();
   const diff = Date.now() - ts;
   const sec = Math.round(diff / 1000);
-  if (sec < 60) return `${sec}s ago`;
-  if (sec < 3600) return `${Math.round(sec / 60)}m ago`;
-  if (sec < 86400) return `${Math.round(sec / 3600)}h ago`;
-  return `${Math.round(sec / 86400)}d ago`;
+  if (sec < 60) return { value: sec, unitKey: "s" };
+  if (sec < 3600) return { value: Math.round(sec / 60), unitKey: "m" };
+  if (sec < 86400) return { value: Math.round(sec / 3600), unitKey: "h" };
+  return { value: Math.round(sec / 86400), unitKey: "d" };
 }
 
-export default function RunCard({
+export default async function RunCard({
   run,
   href,
 }: {
@@ -24,6 +25,8 @@ export default function RunCard({
    * an outer Link (which would produce invalid nested-anchor HTML). */
   href?: string;
 }) {
+  const t = await getT();
+  const rel = relativeParts(run.created_at);
   return (
     <Link
       href={href ?? `/history/${run.id}`}
@@ -47,15 +50,15 @@ export default function RunCard({
             {run.triggered_by === "monitor" && (
               <span
                 className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-brand"
-                title="Auto-dispatched by the daily Monitor"
+                title={t("runCard.monitorTitle")}
               >
                 <Sparkles className="h-2.5 w-2.5" aria-hidden />
-                Monitor
+                {t("runCard.monitor")}
               </span>
             )}
           </div>
           <div className="mt-1 text-[11px] text-fg-subtle tabular-nums">
-            {formatRelative(run.created_at)}
+            {t("runCard.relative", { value: rel.value, unit: t(`runCard.units.${rel.unitKey}`) })}
           </div>
         </div>
 

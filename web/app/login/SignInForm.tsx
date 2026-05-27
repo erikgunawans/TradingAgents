@@ -2,19 +2,14 @@
 "use client";
 
 import ProviderButton from "@/components/ProviderButton";
+import { useT } from "@/lib/i18n/client";
 
-const ERROR_MESSAGES: Record<string, string> = {
-  OAuthAccountNotLinked:
-    "An account with this email already exists with a different sign-in method. Try signing in with your original provider.",
-  AccessDenied: "Sign-in was cancelled or denied.",
-  Configuration: "Sign-in is misconfigured. Please contact the administrator.",
-  Verification: "The sign-in link is no longer valid. Please request a new one.",
-};
-
-function friendlyError(code: string | undefined): string | null {
-  if (!code) return null;
-  return ERROR_MESSAGES[code] ?? `Sign-in failed (${code}). Please try again.`;
-}
+const KNOWN_ERRORS = [
+  "OAuthAccountNotLinked",
+  "AccessDenied",
+  "Configuration",
+  "Verification",
+] as const;
 
 interface Props {
   callbackUrl?: string;
@@ -22,7 +17,12 @@ interface Props {
 }
 
 export default function SignInForm({ callbackUrl, error }: Props) {
-  const errorMessage = friendlyError(error);
+  const t = useT();
+  const errorMessage = !error
+    ? null
+    : (KNOWN_ERRORS as readonly string[]).includes(error)
+      ? t(`login.errors.${error}`)
+      : t("login.errors.generic", { code: error });
 
   return (
     <div className="space-y-2">

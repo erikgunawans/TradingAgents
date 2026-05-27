@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import SessionProviderClient from "@/components/SessionProviderClient";
+import { LocaleProvider } from "@/lib/i18n/client";
+import { getLocale } from "@/lib/i18n/server";
 import "./globals.css";
 
 // Inter for UI, JetBrains Mono for prices, tickers, log streams. CSS variables
@@ -27,11 +29,14 @@ export const viewport = {
   themeColor: "#080808", // Axiara Background
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const locale = await getLocale();
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
+    <html lang={locale} className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
       <body className="bg-bg text-fg">
-        <SessionProviderClient>{children}</SessionProviderClient>
+        <SessionProviderClient>
+          <LocaleProvider locale={locale}>{children}</LocaleProvider>
+        </SessionProviderClient>
       </body>
     </html>
   );

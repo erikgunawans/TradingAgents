@@ -18,6 +18,7 @@ import {
 import type { OHLCVBar, DecisionPin } from "@/lib/types";
 import { ema, rsi, sma } from "./TickerChartWorkspace.indicators";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/client";
 
 interface Props {
   bars: OHLCVBar[];
@@ -57,6 +58,7 @@ export default function TickerChartWorkspace({
   interval,
   dataRangeClipped,
 }: Props) {
+  const t = useT();
   const priceContainerRef = useRef<HTMLDivElement>(null);
   const rsiContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -230,7 +232,7 @@ export default function TickerChartWorkspace({
   if (bars.length === 0) {
     return (
       <div className="rounded-xl border border-border/60 bg-surface/40 p-6 text-sm text-fg-muted backdrop-blur-sm">
-        Price data unavailable for this range — showing decisions below only.
+        {t("ticker.chartUnavailable")}
       </div>
     );
   }
@@ -251,7 +253,7 @@ export default function TickerChartWorkspace({
         </div>
         <div
           role="tablist"
-          aria-label="Chart interval"
+          aria-label={t("ticker.intervalAria")}
           className="inline-flex items-center rounded-md border border-border/60 bg-surface/40"
         >
           <button

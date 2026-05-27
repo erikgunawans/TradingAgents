@@ -5,6 +5,7 @@ import { AlertTriangle, WifiOff } from "lucide-react";
 import type { RunStatus, RunTailOut } from "@/lib/types";
 import StatusBadge from "./StatusBadge";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/client";
 
 interface Props {
   runId: string;
@@ -59,6 +60,7 @@ export default function LiveLogStream({
   pollIntervalMs = 2000,
   maxConsecutiveFailures = 5,
 }: Props) {
+  const t = useT();
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<RunStatus>(initialStatus);
   const [streamHealth, setStreamHealth] = useState<"ok" | "degraded" | "broken">("ok");
@@ -149,13 +151,13 @@ export default function LiveLogStream({
           {streamHealth === "degraded" && (
             <span className="inline-flex items-center gap-1.5 text-xs text-warning">
               <WifiOff className="h-3 w-3" aria-hidden />
-              Reconnecting…
+              {t("liveLog.reconnecting")}
             </span>
           )}
           {streamHealth === "broken" && (
             <span className="inline-flex items-center gap-1.5 text-xs text-danger">
               <AlertTriangle className="h-3 w-3" aria-hidden />
-              Stream unavailable — reload to retry
+              {t("liveLog.streamUnavailable")}
             </span>
           )}
           <StatusBadge status={status} />
@@ -168,12 +170,12 @@ export default function LiveLogStream({
         className="max-h-[600px] overflow-y-auto bg-bg px-4 py-3 font-mono text-xs leading-relaxed"
         role="log"
         aria-live="polite"
-        aria-label="Worker log stream"
+        aria-label={t("liveLog.logLabel")}
       >
         {lines.length === 0 ? (
           <div className="flex items-center gap-2 text-fg-subtle">
             <span className="inline-block h-2 w-2 animate-pulse-soft rounded-full bg-warning" aria-hidden />
-            Waiting for output…
+            {t("liveLog.waiting")}
           </div>
         ) : (
           <div className="space-y-0.5">

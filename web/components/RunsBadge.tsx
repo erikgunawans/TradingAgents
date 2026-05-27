@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { countActiveRunsAction } from "@/app/actions";
+import { useT } from "@/lib/i18n/client";
 
 const POLL_INTERVAL_MS = 10_000;
 
 export default function RunsBadge() {
+  const t = useT();
   const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
@@ -35,12 +37,10 @@ export default function RunsBadge() {
     <Link
       href="/history"
       className="inline-flex items-center gap-1.5 rounded-full border border-brand/40 bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand transition-colors hover:bg-brand/15"
-      aria-label={`${count} ${count === 1 ? "run" : "runs"} in progress`}
+      aria-label={t("runsBadge.aria", { count })}
     >
       <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-      <span>
-        {count} {count === 1 ? "run" : "runs"}
-      </span>
+      <span>{t("runsBadge.label", { count })}</span>
     </Link>
   );
 }

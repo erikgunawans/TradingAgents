@@ -6,17 +6,20 @@ import { Activity, Bookmark, History, PieChart, PlayCircle, Zap } from "lucide-r
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/cn";
 import RunsBadge from "@/components/RunsBadge";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useT } from "@/lib/i18n/client";
 
 const NAV_ITEMS = [
-  { href: "/history", label: "History", icon: History },
-  { href: "/live", label: "Live", icon: Activity },
-  { href: "/launch", label: "Launch", icon: PlayCircle },
-  { href: "/portfolio", label: "Portfolio", icon: PieChart },
-  { href: "/watchlist", label: "Watchlist", icon: Bookmark },
-  { href: "/signals", label: "Signals", icon: Zap },
-];
+  { href: "/history", key: "history", icon: History },
+  { href: "/live", key: "live", icon: Activity },
+  { href: "/launch", key: "launch", icon: PlayCircle },
+  { href: "/portfolio", key: "portfolio", icon: PieChart },
+  { href: "/watchlist", key: "watchlist", icon: Bookmark },
+  { href: "/signals", key: "signals", icon: Zap },
+] as const;
 
 export default function Nav() {
+  const t = useT();
   const pathname = usePathname();
   const { data: session } = useSession();
   const githubId = (session?.user as { githubId?: string } | undefined)?.githubId;
@@ -40,7 +43,7 @@ export default function Nav() {
         </Link>
 
         <div className="ml-2 flex flex-1 items-center gap-0.5">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          {NAV_ITEMS.map(({ href, key, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link
@@ -53,7 +56,7 @@ export default function Nav() {
                 )}
               >
                 <Icon className="h-[14px] w-[14px]" aria-hidden />
-                <span className="hidden md:inline">{label}</span>
+                <span className="hidden md:inline">{t(`nav.${key}`)}</span>
                 {active && (
                   <span
                     className="absolute inset-x-2 -bottom-[14px] h-px bg-brand"
@@ -65,22 +68,25 @@ export default function Nav() {
           })}
         </div>
 
-        {githubId && (
-          <div className="flex items-center gap-3 text-[12px]">
-            <RunsBadge />
-            <span className="hidden text-fg-subtle sm:inline">
-              <span className="text-fg-subtle">gh:</span>
-              <span className="font-mono text-fg-muted">{githubId}</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="text-fg-subtle transition-colors hover:text-fg"
-            >
-              Sign out
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-3 text-[12px]">
+          <LanguageToggle />
+          {githubId && (
+            <>
+              <RunsBadge />
+              <span className="hidden text-fg-subtle sm:inline">
+                <span className="text-fg-subtle">gh:</span>
+                <span className="font-mono text-fg-muted">{githubId}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="text-fg-subtle transition-colors hover:text-fg"
+              >
+                {t("nav.signOut")}
+              </button>
+            </>
+          )}
+        </div>
       </nav>
     </header>
   );

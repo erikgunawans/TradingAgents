@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AlertCircle, ArrowRight, FileText } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getT } from "@/lib/i18n/server";
 import Nav from "@/components/Nav";
 import RatingBadge from "@/components/RatingBadge";
 import LiveLogStream from "@/components/LiveLogStream";
@@ -14,6 +15,7 @@ export default async function LiveRunPage({
 }) {
   const session = await auth();
   if (!session?.user) redirect("/api/auth/signin");
+  const t = await getT();
   const { runId } = await params;
   let run;
   try {
@@ -50,7 +52,7 @@ export default async function LiveRunPage({
             className="mt-4 inline-flex items-center gap-1.5 text-sm text-brand transition-colors hover:text-brand/80"
           >
             <FileText className="h-4 w-4" aria-hidden />
-            View final reports
+            {t("runDetail.viewFinalReports")}
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
         )}
@@ -62,7 +64,7 @@ export default async function LiveRunPage({
           >
             <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger" aria-hidden />
             <div className="min-w-0">
-              <div className="font-semibold text-danger">Error</div>
+              <div className="font-semibold text-danger">{t("common.error")}</div>
               <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-xs text-fg-muted">
                 {run.error_summary}
               </pre>

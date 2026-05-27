@@ -13,14 +13,16 @@ import {
 import { LineChart as LineChartIcon } from "lucide-react";
 import type { PnLPoint } from "@/lib/types";
 import EmptyState from "./EmptyState";
+import { useT } from "@/lib/i18n/client";
 
 export default function PnLChart({ points }: { points: PnLPoint[] }) {
+  const t = useT();
   if (points.length === 0) {
     return (
       <EmptyState
         icon={LineChartIcon}
-        title="No resolved decisions yet"
-        description="Once a decision is reflected on (return + alpha known), it appears here as a P&L point."
+        title={t("portfolio.chartEmptyTitle")}
+        description={t("portfolio.chartEmptyDesc")}
       />
     );
   }

@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import SignInForm from "./SignInForm";
 import E2ESignIn from "./E2ESignIn";
+import { getT } from "@/lib/i18n/server";
+import LanguageToggle from "@/components/LanguageToggle";
 
 export const metadata = {
   title: "Sign in · TradingAgents",
@@ -21,6 +23,7 @@ interface PageProps {
 
 export default async function LoginPage({ searchParams }: PageProps) {
   const session = await auth();
+  const t = await getT();
   const { error, callbackUrl } = await searchParams;
 
   if (session) {
@@ -30,6 +33,9 @@ export default async function LoginPage({ searchParams }: PageProps) {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-10">
       <div className="w-full max-w-sm rounded-2xl border border-white/[0.06] bg-surface/55 px-7 py-7 text-center backdrop-blur-sm">
+        <div className="mb-4 flex justify-center">
+          <LanguageToggle />
+        </div>
         <div
           className="mx-auto mb-4 flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-brand to-red-dark font-bold text-white shadow-glow"
           aria-hidden="true"
@@ -39,9 +45,9 @@ export default async function LoginPage({ searchParams }: PageProps) {
         <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-brand/85">
           tradingagents
         </p>
-        <h1 className="text-lg font-semibold text-fg-primary">Sign in</h1>
+        <h1 className="text-lg font-semibold text-fg-primary">{t("login.title")}</h1>
         <p className="mb-5 mt-1.5 text-xs text-fg-muted">
-          Continue with your preferred account
+          {t("login.subtitle")}
         </p>
         <SignInForm callbackUrl={isSafeRedirect(callbackUrl) ? callbackUrl : undefined} error={error} />
         {process.env.E2E_TEST_MODE === "1" && (

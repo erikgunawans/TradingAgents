@@ -1,6 +1,7 @@
 // web/components/DecisionTimeline.tsx
 import type { DecisionPin } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { getT } from "@/lib/i18n/server";
 
 function pct(x: number | null): string {
   if (x === null || x === undefined) return "—";
@@ -13,15 +14,16 @@ function pctColor(x: number | null): string {
   return x >= 0 ? "text-success" : "text-danger";
 }
 
-export default function DecisionTimeline({
+export default async function DecisionTimeline({
   decisions,
 }: {
   decisions: DecisionPin[];
 }) {
+  const t = await getT();
   if (decisions.length === 0) {
     return (
       <p className="px-4 py-6 text-sm text-fg-muted">
-        No decisions yet for this ticker.
+        {t("ticker.timelineEmpty")}
       </p>
     );
   }
@@ -32,16 +34,16 @@ export default function DecisionTimeline({
         <thead>
           <tr className="border-b border-border/40 text-left">
             <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
-              Date
+              {t("ticker.colDate")}
             </th>
             <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
-              Rating
+              {t("ticker.colRating")}
             </th>
             <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
-              Status
+              {t("ticker.colStatus")}
             </th>
             <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle text-right">
-              Realized return
+              {t("ticker.colRealizedReturn")}
             </th>
           </tr>
         </thead>

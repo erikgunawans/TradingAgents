@@ -5,13 +5,9 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Loader2, Play, ArrowRight } from "lucide-react";
 import { launchRunAction, type LaunchFormError } from "@/app/launch/actions";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/client";
 
-const ANALYSTS = [
-  { key: "market", label: "Market", hint: "Price action, technical indicators" },
-  { key: "social", label: "Social", hint: "Sentiment from social signals" },
-  { key: "news", label: "News", hint: "Recent news + insider transactions" },
-  { key: "fundamentals", label: "Fundamentals", hint: "Balance sheet, cashflow, income" },
-] as const;
+const ANALYST_KEYS = ["market", "social", "news", "fundamentals"] as const;
 
 /** Section card matches the rhythm of /history rows and /portfolio stat cards:
  * glass surface, soft border, top hairline highlight, generous padding. The
@@ -46,6 +42,7 @@ function SectionCard({
 }
 
 export default function LaunchForm() {
+  const t = useT();
   const [error, setError] = useState<LaunchFormError | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -61,8 +58,8 @@ export default function LaunchForm() {
   return (
     <form action={onSubmit} className="grid gap-4">
       <SectionCard
-        eyebrow="Symbol & date"
-        description="The ticker the analysts evaluate, and the reference date."
+        eyebrow={t("launchForm.symbolDateEyebrow")}
+        description={t("launchForm.symbolDateDesc")}
       >
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
@@ -70,7 +67,7 @@ export default function LaunchForm() {
               htmlFor="ticker"
               className="mb-2 block text-[11px] font-medium uppercase tracking-[0.14em] text-fg-muted"
             >
-              Ticker
+              {t("launchForm.tickerLabel")}
             </label>
             <input
               id="ticker"
@@ -83,10 +80,10 @@ export default function LaunchForm() {
               className="h-11 w-full rounded-lg border border-border/60 bg-bg/40 px-3.5 font-mono text-[15px] text-fg placeholder:text-fg-subtle/60 transition-colors focus:border-brand/60 focus:bg-bg/70 focus:outline-none focus:ring-1 focus:ring-brand/40"
             />
             <p className="mt-2 text-xs text-fg-subtle">
-              US listing or supported foreign suffix — e.g.{" "}
+              {t("launchForm.tickerHintPrefix")}
               <span className="font-mono text-fg-muted">NVDA</span>,{" "}
-              <span className="font-mono text-fg-muted">7203.T</span> (Tokyo),{" "}
-              <span className="font-mono text-fg-muted">BBCA.JK</span> (Jakarta).
+              <span className="font-mono text-fg-muted">7203.T</span> {t("launchForm.tickerHintTokyo")},{" "}
+              <span className="font-mono text-fg-muted">BBCA.JK</span> {t("launchForm.tickerHintJakarta")}.
             </p>
           </div>
 
@@ -95,7 +92,7 @@ export default function LaunchForm() {
               htmlFor="trade_date"
               className="mb-2 block text-[11px] font-medium uppercase tracking-[0.14em] text-fg-muted"
             >
-              Trade date
+              {t("launchForm.tradeDateLabel")}
             </label>
             <input
               id="trade_date"
@@ -105,35 +102,35 @@ export default function LaunchForm() {
               className="h-11 w-full rounded-lg border border-border/60 bg-bg/40 px-3.5 font-mono text-[15px] text-fg transition-colors focus:border-brand/60 focus:bg-bg/70 focus:outline-none focus:ring-1 focus:ring-brand/40 [color-scheme:dark]"
             />
             <p className="mt-2 text-xs text-fg-subtle">
-              Past trading day; the analysts evaluate against this date.
+              {t("launchForm.tradeDateHint")}
             </p>
           </div>
         </div>
       </SectionCard>
 
       <SectionCard
-        eyebrow="Analysts"
-        description="All four run by default. Disable any you don't want."
+        eyebrow={t("launchForm.analystsEyebrow")}
+        description={t("launchForm.analystsDesc")}
       >
         {/* 4-up at lg+ (one row across the wide card), 2-up at sm-md,
          * stacked on mobile. Echoes the 5-up stat grid on /portfolio. */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {ANALYSTS.map((a) => (
+          {ANALYST_KEYS.map((key) => (
             <label
-              key={a.key}
+              key={key}
               className="group relative flex cursor-pointer items-start gap-3 rounded-lg border border-border/40 bg-bg/30 p-4 transition-all hover:border-border hover:bg-bg/50 has-[:checked]:border-brand/35 has-[:checked]:bg-brand/[0.04]"
             >
               <input
                 type="checkbox"
                 name="analysts"
-                value={a.key}
+                value={key}
                 defaultChecked
                 className="mt-0.5 h-4 w-4 cursor-pointer rounded border-border bg-surface accent-brand focus:ring-1 focus:ring-brand focus:ring-offset-0"
               />
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-fg">{a.label}</div>
+                <div className="text-sm font-medium text-fg">{t(`launchForm.analysts.${key}.label`)}</div>
                 <div className="mt-1 text-xs leading-relaxed text-fg-subtle">
-                  {a.hint}
+                  {t(`launchForm.analysts.${key}.hint`)}
                 </div>
               </div>
             </label>
@@ -148,9 +145,9 @@ export default function LaunchForm() {
           className="mt-0.5 h-4 w-4 rounded border-border bg-surface/40 text-brand focus:ring-2 focus:ring-brand/40"
         />
         <span>
-          Watch live
+          {t("launchForm.watchLiveLabel")}
           <span className="ml-2 text-xs text-fg-subtle">
-            — stream the worker's log as it runs. Otherwise you land on History and can open it later.
+            {t("launchForm.watchLiveHint")}
           </span>
         </span>
       </label>
@@ -167,13 +164,13 @@ export default function LaunchForm() {
             <div className="min-w-0 flex-1">
               {error.kind === "conflict" ? (
                 <>
-                  <p>A run is already in progress for this ticker + date.</p>
+                  <p>{t("launchForm.conflict")}</p>
                   <button
                     type="button"
                     onClick={() => router.push(`/live/${error.existingRunId}`)}
                     className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-fg underline-offset-2 hover:underline"
                   >
-                    View running run
+                    {t("launchForm.viewRunningRun")}
                     <ArrowRight className="h-3 w-3" aria-hidden />
                   </button>
                 </>
@@ -199,12 +196,12 @@ export default function LaunchForm() {
           {isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-              Launching…
+              {t("launchForm.launching")}
             </>
           ) : (
             <>
               <Play className="h-4 w-4" strokeWidth={2.5} aria-hidden />
-              Launch analysis
+              {t("launchForm.submit")}
             </>
           )}
         </button>

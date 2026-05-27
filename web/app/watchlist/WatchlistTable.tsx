@@ -7,12 +7,14 @@ import { Pencil, Trash2 } from "lucide-react";
 import { removeFromWatchlistAction, updateWatchlistNotesAction } from "@/app/actions";
 import type { WatchlistItemOut } from "@/lib/types";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/client";
 
 export default function WatchlistTable({
   initialItems,
 }: {
   initialItems: WatchlistItemOut[];
 }) {
+  const t = useT();
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [editing, setEditing] = useState<string | null>(null); // ticker
@@ -66,7 +68,7 @@ export default function WatchlistTable({
   if (items.length === 0) {
     return (
       <div className="rounded-xl border border-border/60 bg-surface/40 px-4 py-10 text-center text-sm text-fg-muted backdrop-blur-sm">
-        Add a ticker above to start watching.
+        {t("watchlistTable.empty")}
       </div>
     );
   }
@@ -78,15 +80,15 @@ export default function WatchlistTable({
           <thead>
             <tr className="border-b border-border/40 text-left">
               <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
-                Ticker
+                {t("watchlistTable.colTicker")}
               </th>
               <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
-                Notes
+                {t("watchlistTable.colNotes")}
               </th>
               <th className="px-4 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
-                Added
+                {t("watchlistTable.colAdded")}
               </th>
-              <th className="w-24 px-4 py-3" aria-label="Actions" />
+              <th className="w-24 px-4 py-3" aria-label={t("watchlistTable.actionsAria")} />
             </tr>
           </thead>
           <tbody>
@@ -133,7 +135,7 @@ export default function WatchlistTable({
                       className="group flex w-full items-start gap-2 text-left hover:text-fg"
                     >
                       <span className={cn(item.notes ? "" : "italic text-fg-subtle")}>
-                        {item.notes || "Click to add notes"}
+                        {item.notes || t("watchlistTable.clickToAddNotes")}
                       </span>
                       <Pencil className="h-3 w-3 flex-shrink-0 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
                     </button>
@@ -146,7 +148,7 @@ export default function WatchlistTable({
                   <button
                     type="button"
                     onClick={() => setRemoveTarget(item.ticker)}
-                    aria-label={`Remove ${item.ticker} from watchlist`}
+                    aria-label={t("watchlistTable.removeAria", { ticker: item.ticker })}
                     className="inline-flex h-7 w-7 items-center justify-center rounded text-fg-subtle transition-colors hover:bg-danger/10 hover:text-danger"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden />
@@ -163,9 +165,11 @@ export default function WatchlistTable({
         onClose={() => setRemoveTarget(null)}
         className="rounded-xl border border-border/60 bg-surface p-6 backdrop:bg-black/60 backdrop-blur-sm text-fg"
       >
-        <h3 className="mb-2 text-sm font-semibold">Remove from watchlist?</h3>
+        <h3 className="mb-2 text-sm font-semibold">{t("watchlistTable.removeTitle")}</h3>
         <p className="mb-4 text-sm text-fg-muted">
-          Remove <span className="font-mono">{removeTarget}</span> from your watchlist?
+          {t("watchlistTable.removeBodyPrefix")}
+          <span className="font-mono">{removeTarget}</span>
+          {t("watchlistTable.removeBodySuffix")}
         </p>
         <div className="flex justify-end gap-2">
           <button
@@ -176,14 +180,14 @@ export default function WatchlistTable({
             }}
             className="rounded-lg border border-border/60 bg-surface/40 px-3 py-1.5 text-sm text-fg-muted hover:text-fg"
           >
-            Cancel
+            {t("watchlistTable.cancel")}
           </button>
           <button
             type="button"
             onClick={confirmRemove}
             className="rounded-lg border border-danger/60 bg-danger/10 px-3 py-1.5 text-sm text-danger hover:bg-danger/15"
           >
-            Remove
+            {t("watchlistTable.remove")}
           </button>
         </div>
       </dialog>
