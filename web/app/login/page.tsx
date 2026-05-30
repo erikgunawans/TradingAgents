@@ -9,7 +9,7 @@ import { envFlag } from "@/lib/env";
 import LanguageToggle from "@/components/LanguageToggle";
 
 export const metadata = {
-  title: "Sign in · TradingAgents",
+  title: "Sign in · TradiX",
 };
 
 // Accepts only relative paths (starts with a single slash).
@@ -38,14 +38,16 @@ export default async function LoginPage({ searchParams }: PageProps) {
         <div className="mb-4 flex justify-center">
           <LanguageToggle />
         </div>
-        <div
-          className="mx-auto mb-4 flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-brand to-red-dark font-bold text-white shadow-glow"
-          aria-hidden="true"
-        >
-          /
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo-mark.png"
+          alt="TradiX"
+          className="mx-auto mb-4 h-10 w-10"
+          width={40}
+          height={40}
+        />
         <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-brand/85">
-          tradingagents
+          tradix
         </p>
         <h1 className="text-lg font-semibold text-fg-primary">{t("login.title")}</h1>
         <p className="mb-5 mt-1.5 text-xs text-fg-muted">

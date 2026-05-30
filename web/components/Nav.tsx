@@ -31,14 +31,17 @@ export default function Nav() {
           href="/history"
           className="group mr-2 flex items-center gap-2.5 text-fg transition-opacity hover:opacity-90"
         >
-          {/* Axiara slash-mark — three angled bars, brand-red weighted */}
-          <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" aria-hidden>
-            <path d="M7 4 L4 20" stroke="rgb(var(--brand))" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M14 4 L11 20" stroke="rgb(var(--brand))" strokeWidth="2.5" strokeLinecap="round" />
-            <path d="M21 4 L18 20" stroke="rgb(var(--fg))" strokeWidth="2.5" strokeLinecap="round" opacity="0.3" />
-          </svg>
+          {/* TradiX brand mark — three angled red strokes (Axiara) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-mark.png"
+            alt="TradiX"
+            className="h-[20px] w-[20px]"
+            width={20}
+            height={20}
+          />
           <span className="hidden text-[13px] font-semibold uppercase tracking-[0.14em] sm:inline">
-            Trading<span className="text-fg-muted">Agents</span>
+            TradiX
           </span>
         </Link>
 

@@ -6,7 +6,7 @@ import Nav from "@/components/Nav";
 import PageHeader from "@/components/PageHeader";
 import SignalsFeed from "./SignalsFeed";
 
-export const metadata = { title: "Signals · TradingAgents" };
+export const metadata = { title: "Signals · TradiX" };
 
 export default async function SignalsPage() {
   const session = await auth();

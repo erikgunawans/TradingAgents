@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "TradingAgents Dashboard",
+  title: "TradiX Dashboard",
   description: "Multi-agent LLM trading framework — run analyses, watch reasoning, track P&L.",
 };
 
