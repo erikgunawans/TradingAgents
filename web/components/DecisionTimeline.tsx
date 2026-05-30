@@ -54,14 +54,14 @@ export default async function DecisionTimeline({
               className="border-b border-border/30 transition-colors last:border-0 hover:bg-surface/60"
             >
               <td className="px-4 py-2.5 font-mono text-fg-muted">{d.trade_date}</td>
-              <td className="px-4 py-2.5 text-fg">{d.rating}</td>
+              <td className="px-4 py-2.5 text-fg">{t(`rating.${d.rating}`)}</td>
               <td
                 className={cn(
                   "px-4 py-2.5 font-mono text-xs",
                   d.status === "pending" ? "text-fg-subtle" : "text-fg-muted",
                 )}
               >
-                {d.status}
+                {t(`decisionStatus.${d.status}`)}
               </td>
               <td
                 className={cn(

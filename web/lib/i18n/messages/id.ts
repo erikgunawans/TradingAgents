@@ -131,9 +131,9 @@ export const id: typeof en = {
       maxDrawdown: "Max drawdown",
       trades: "Transaksi",
     },
-    chartEmptyTitle: "Belum ada keputusan yang terselesaikan",
+    chartEmptyTitle: "Belum ada keputusan yang selesai dievaluasi",
     chartEmptyDesc:
-      "Setelah sebuah keputusan ditinjau (return + alpha diketahui), keputusan itu muncul di sini sebagai titik P&L.",
+      "Begitu hasil sebuah keputusan diketahui (return + alpha tersedia), ia muncul di sini sebagai titik P&L.",
   },
 
   ticker: {
@@ -146,6 +146,20 @@ export const id: typeof en = {
     colRealizedReturn: "Return terealisasi",
     intervalAria: "Interval grafik",
     chartUnavailable: "Data harga tidak tersedia untuk rentang ini — hanya menampilkan keputusan di bawah.",
+    dataRangeClipped: "Data per jam hanya tersedia untuk 60 hari terakhir.",
+  },
+
+  rating: {
+    Buy: "Beli",
+    Overweight: "Akumulasi",
+    Hold: "Tahan",
+    Underweight: "Kurangi",
+    Sell: "Jual",
+  },
+
+  decisionStatus: {
+    pending: "menunggu",
+    resolved: "selesai",
   },
 
   reportTabs: {
@@ -168,7 +182,7 @@ export const id: typeof en = {
 
   runCard: {
     monitor: "Monitor",
-    monitorTitle: "Dikirim otomatis oleh Monitor harian",
+    monitorTitle: "Dijalankan otomatis oleh Monitor harian",
     relative: ({ value, unit }) => `${value}${unit} lalu`,
     units: { s: " dtk", m: " mnt", h: " jam", d: " hr" },
   },
@@ -209,7 +223,7 @@ export const id: typeof en = {
     enable: "Aktifkan notifikasi",
     disable: "Nonaktifkan notifikasi",
     descOff:
-      "Dapatkan email saat ada sinyal yang bisa ditindaklanjuti — tenang di hari yang semuanya HOLD.",
+      "Dapatkan email saat ada sinyal yang bisa ditindaklanjuti — tidak ada email di hari semua HOLD.",
     alertOnRatings: "Notifikasi untuk rating",
     alertRatingsAria: "Rating notifikasi",
     descOn: ({ label }) =>
@@ -251,7 +265,7 @@ export const id: typeof en = {
   watchlistPage: {
     eyebrow: "Ticker",
     title: "Watchlist",
-    description: "Ticker yang dipantau monitor agentik untuk sinyal beli/jual.",
+    description: "Ticker yang dipantau Monitor harian untuk sinyal beli/jual.",
   },
 
   signals: {
@@ -261,7 +275,7 @@ export const id: typeof en = {
     descDefault: "Analisis otomatis setiap ticker di watchlist — begitu Monitor harian aktif.",
     monitorOffTitle: "Monitor harian nonaktif",
     monitorOffDesc:
-      "Aktifkan Monitor harian di /watchlist untuk mendapat sinyal baru bagi setiap ticker setiap pagi.",
+      "Aktifkan Monitor harian di /watchlist agar setiap pagi Anda dapat sinyal baru untuk tiap ticker.",
     goToWatchlist: "Buka Watchlist",
     noSignalsTitle: ({ date }) => `Belum ada sinyal untuk ${date}`,
     today: "hari ini",
