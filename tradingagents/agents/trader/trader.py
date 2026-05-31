@@ -9,7 +9,7 @@ from langchain_core.messages import AIMessage
 from tradingagents.agents.schemas import TraderProposal, render_trader_proposal
 from tradingagents.agents.utils.agent_utils import (
     build_instrument_context,
-    get_language_instruction,
+    get_rating_language_instruction,
 )
 from tradingagents.agents.utils.structured import (
     bind_structured,
@@ -33,7 +33,7 @@ def create_trader(llm):
                     "You are a trading agent analyzing market data to make investment decisions. "
                     "Based on your analysis, provide a specific recommendation to buy, sell, or hold. "
                     "Anchor your reasoning in the analysts' reports and the research plan."
-                    + get_language_instruction()
+                    + get_rating_language_instruction()
                 ),
             },
             {

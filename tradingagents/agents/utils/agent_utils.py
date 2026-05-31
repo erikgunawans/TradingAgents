@@ -36,6 +36,30 @@ def get_language_instruction() -> str:
     return f" Write your entire response in {lang}."
 
 
+def get_rating_language_instruction() -> str:
+    """Language instruction for agents that emit a 5-tier rating token.
+
+    Same prose-language override as ``get_language_instruction``, plus a
+    HARD requirement that the literal "Rating: X" token stay in English with
+    X ∈ {Buy, Overweight, Hold, Underweight, Sell}. The downstream
+    ``parse_rating`` heuristic (tradingagents/agents/utils/rating.py) greps
+    for those exact tokens — translating the token would break final_rating
+    extraction and silently degrade every non-English run to "Hold".
+    Display-side translation already exists via the web `rating.*` i18n
+    catalog (RatingBadge), so the user still sees a localized label.
+    """
+    from tradingagents.dataflows.config import get_config
+    lang = get_config().get("output_language", "English")
+    if lang.strip().lower() == "english":
+        return ""
+    return (
+        f" Write your entire response in {lang}. CRITICAL: keep the literal token "
+        "'Rating: X' in English, where X is exactly one of Buy, Overweight, Hold, "
+        "Underweight, Sell. All surrounding prose stays in "
+        f"{lang}; only the rating word itself stays English."
+    )
+
+
 def build_instrument_context(ticker: str, asset_type: str = "stock") -> str:
     """Describe the exact instrument so agents preserve exchange-qualified tickers."""
     instrument_label = "asset" if asset_type == "crypto" else "instrument"
