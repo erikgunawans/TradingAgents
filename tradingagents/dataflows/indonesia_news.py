@@ -51,13 +51,26 @@ _FETCH_TIMEOUT_S = 10
 # bersih Q1 naik 12%" should match BBCA even though the headline doesn't carry
 # the ticker symbol. Stays small and Indonesian-financial-relevant; we don't
 # try to be exhaustive — the LLM sorts noise.
+#
+# Alias-ambiguity rule: every alias must be either (a) a ticker stem (always
+# unique by definition), (b) a multi-word company name, or (c) a short
+# abbreviation that is unambiguously financial in Indonesian usage (BCA, BRI,
+# BNI). Do NOT add short aliases that are also common Indonesian or English
+# words — they will false-positive in unrelated articles. Two real cases that
+# bit us:
+#   - "Mandiri" alone (Indonesian for "independent/self-sufficient") pulled
+#     unrelated articles about independent shoe production, independent
+#     farmers, etc. into BMRI's news report.
+#   - "Astra" alone matches "Astra school", "Astra astronomy", and a long
+#     tail of unrelated proper nouns.
+# Both are kept ONLY in their full-company-name form.
 _TICKER_ALIASES: dict[str, list[str]] = {
     "BBCA": ["Bank Central Asia", "BCA"],
     "BBRI": ["Bank Rakyat Indonesia", "BRI"],
-    "BMRI": ["Bank Mandiri", "Mandiri"],
+    "BMRI": ["Bank Mandiri"],
     "BBNI": ["Bank Negara Indonesia", "BNI"],
     "TLKM": ["Telkom Indonesia", "Telkom"],
-    "ASII": ["Astra International", "Astra"],
+    "ASII": ["Astra International"],
     "UNVR": ["Unilever Indonesia"],
     "GOTO": ["GoTo Gojek Tokopedia", "GoTo", "Gojek", "Tokopedia"],
     "GGRM": ["Gudang Garam"],
