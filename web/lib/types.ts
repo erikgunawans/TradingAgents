@@ -1,78 +1,54 @@
 import type { components } from "@/lib/openapi-types";
 
+// --- Narrow string unions (TS-only ergonomics; no Pydantic counterpart) ---
+
 export type RunStatus = "queued" | "running" | "succeeded" | "failed";
-
-export interface RunOut {
-  id: string;
-  ticker: string;
-  trade_date: string;
-  status: RunStatus;
-  final_rating: string | null;
-  created_at: string;
-  completed_at: string | null;
-  triggered_by: string;
-}
-
-export interface RunListOut {
-  items: RunOut[];
-}
-
-export interface ReportSections {
-  market: string | null;
-  sentiment: string | null;
-  news: string | null;
-  fundamentals: string | null;
-  investment_plan: string | null;
-  trader_plan: string | null;
-  final: string | null;
-}
-
-export interface RunDetailOut extends RunOut {
-  results_path: string;
-  error_summary: string | null;
-  report_sections: ReportSections;
-}
-
-export interface UserOut {
-  id: string;
-  github_id: string | null;
-  email: string | null;
-  created_at: string;
-  monitor_enabled: boolean;
-  briefing_time_local: string | null;
-  briefing_tz: string | null;
-}
-
 export type AnalystKey = "market" | "social" | "news" | "fundamentals";
 
-export interface RunCreate {
-  ticker: string;
-  trade_date: string;
-  analysts?: AnalystKey[];
-  asset_type?: "stock" | "crypto";
-}
+// --- Run schemas (re-exported from openapi-types, narrowed where useful) ---
+//
+// All schemas in this section mirror Pydantic models in server/app/schemas/.
+// After a Pydantic schema change, run `npm run codegen` to regenerate
+// web/lib/openapi-types.ts; the re-exports below pick up field additions
+// and removals automatically. `npm run codegen:check` fails CI if the
+// committed openapi-types.ts is stale.
+//
+// Two narrowings worth knowing about (server quirks the auto-gen can't fix):
+//
+// 1. `status` on RunOut / RunDetailOut — Pydantic types these as `str` but
+//    semantically they're always one of the four RunStatus values.
+//    `WithRunStatus<T>` restores the narrow union on the TS side until the
+//    server schemas are unified to use the RunStatus enum (RunTailOut
+//    already does, hence no narrowing for it).
+//
+// 2. `asset_type` on RunCreate — Pydantic gives it a default ("stock"),
+//    but openapi-typescript still marks fields-with-defaults as required.
+//    Callers that omit it would type-error against the generated form.
+//    The narrowing here restores `?:` so omission stays valid, matching
+//    server runtime behavior. Drop the narrowing once the Pydantic field
+//    is declared as `Optional[Literal[...]] = "stock"`.
 
-export interface RunTailOut {
-  content: string;
-  next_offset: number;
+type WithRunStatus<T extends { status: string }> = Omit<T, "status"> & {
   status: RunStatus;
-}
+};
 
-// --- Wave 3: portfolio — generated from FastAPI Pydantic schemas ---
+export type RunOut = WithRunStatus<components["schemas"]["RunOut"]>;
+export type RunDetailOut = WithRunStatus<components["schemas"]["RunDetailOut"]>;
+export type RunListOut = { items: RunOut[] };
+
+type _RunCreate = components["schemas"]["RunCreate"];
+export type RunCreate = Omit<_RunCreate, "asset_type"> & {
+  asset_type?: "stock" | "crypto";
+};
+
+export type RunTailOut = components["schemas"]["RunTailOut"];
+export type UserOut = components["schemas"]["UserOut"];
+export type ReportSections = components["schemas"]["ReportSections"];
+
+// --- Portfolio / Watchlist / Monitor / Signals / Notifications ---
 //
-// These 7 types are re-exported from web/lib/openapi-types.ts. Do NOT
-// hand-edit them here. After changing a Pydantic schema in
-// server/app/schemas/portfolio.py, run `npm run codegen` to regenerate
-// the openapi-types.ts file; the re-exports below pick up FIELD changes
-// automatically. `npm run codegen:check` fails if the committed
-// openapi-types.ts is stale relative to the current Pydantic schemas.
-//
-// When a NEW Pydantic schema is added (not just a new field on an
-// existing one), also add a corresponding `export type X = ...` line
-// below — codegen alone won't surface it via the friendly-name wrapper.
-//
-// Other types in this file (RunStatus, RunOut, etc.) remain
-// hand-defined until their Pydantic counterparts are migrated.
+// No narrowing needed — these don't have the str-vs-enum or default-field
+// issues that the Run schemas have.
 
 export type MemoryEntryStatus = components["schemas"]["MemoryEntryStatus"];
 export type PortfolioSummaryOut = components["schemas"]["PortfolioSummaryOut"];
