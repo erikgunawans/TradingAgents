@@ -173,6 +173,70 @@ def test_news_data_tools_get_news_routes_jk_to_indonesia():
     assert 'route_to_vendor("get_news", ticker, start_date, end_date)' in src
 
 
+def test_bmri_alias_does_not_match_independence_word_articles():
+    """Smoking-gun regression: 'mandiri' is Indonesian for 'independent /
+    self-sufficient' and appears in countless unrelated articles
+    (independent shoe producers, independent farmers, independent schools).
+    BMRI's alias list must NOT include the bare word 'Mandiri' or the news
+    analyst will get a pile of shoe-industry / agriculture / education news
+    when the user asks about Bank Mandiri. The full company name 'Bank
+    Mandiri' is the only safe short-form alias."""
+    aliases = indonesia_news._aliases_for("BMRI.JK")
+    assert "BMRI" in aliases
+    assert "Bank Mandiri" in aliases
+    assert "Mandiri" not in aliases, (
+        "Bare 'Mandiri' is a common Indonesian word — see the alias-ambiguity "
+        "rule in indonesia_news._TICKER_ALIASES docstring."
+    )
+
+    # Real-shape false-positive articles that must NOT match BMRI.
+    shoe_article = {
+        "title": "UMKM sepatu mandiri tembus pasar ekspor",
+        "description": "Pengrajin sepatu mandiri di Bandung berhasil mengekspor "
+        "ke Malaysia tahun ini.",
+    }
+    farmer_article = {
+        "title": "Petani mandiri di Jawa Barat raih panen melimpah",
+        "description": "Kelompok tani mandiri mengembangkan budidaya organik.",
+    }
+    assert not indonesia_news._matches(shoe_article, aliases), (
+        "Independent-shoe article must NOT match BMRI after the alias fix."
+    )
+    assert not indonesia_news._matches(farmer_article, aliases), (
+        "Independent-farmer article must NOT match BMRI after the alias fix."
+    )
+
+    # Positive: real Bank Mandiri article still matches.
+    real_bmri_article = {
+        "title": "Bank Mandiri umumkan laba bersih Q1 naik 18%",
+        "description": "Bank Mandiri mencatat pertumbuhan kredit yang solid "
+        "didukung segmen ritel.",
+    }
+    assert indonesia_news._matches(real_bmri_article, aliases)
+
+
+def test_asii_alias_does_not_match_generic_astra_word():
+    """Same rule for ASII: bare 'Astra' is a common name/word (Astra school,
+    Astra astronomy society, etc.). Only 'Astra International' (full name)
+    and the ticker stem stay as aliases."""
+    aliases = indonesia_news._aliases_for("ASII.JK")
+    assert "ASII" in aliases
+    assert "Astra International" in aliases
+    assert "Astra" not in aliases
+
+    unrelated = {
+        "title": "Astra school of design buka pendaftaran",
+        "description": "Sekolah desain Astra di Jakarta menerima siswa baru.",
+    }
+    assert not indonesia_news._matches(unrelated, aliases)
+
+    real_asii = {
+        "title": "Astra International catat penjualan mobil Q1 turun 8%",
+        "description": "Astra International mencatat penurunan penjualan.",
+    }
+    assert indonesia_news._matches(real_asii, aliases)
+
+
 def test_matches_word_boundary_excludes_substring_false_positives():
     """PR #17 reviewer flagged that 3-char aliases (BCA, BRI, BNI, PGN)
     would substring-match unrelated text. Word-boundary regex match fixes
