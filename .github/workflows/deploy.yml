@@ -111,9 +111,22 @@ jobs:
           # than --ff-only on CI-managed state.
           git reset --hard origin/main
           echo "$IMAGE_TAG" > .current_image_tag
+          # Reclaim disk BEFORE the pull. Two reasons:
+          #   1. `prune -af` (vs the previous `prune -f`) removes tagged-but-
+          #      unused images, not just dangling layers. Without `-a`, every
+          #      deploy's prior image stays around tagged and the disk fills
+          #      up in ~30 deploys (caught after PR #34/#35 on a 30G VM).
+          #   2. Running this BEFORE `pull` means a previous failed deploy
+          #      that left images behind can't compound — the next deploy
+          #      cleans them out before trying to fetch new ones. The end-
+          #      of-deploy prune still runs to clean the now-unused N-1
+          #      image immediately after the swap.
+          # Best-effort: if prune itself fails (rare containerd snapshot
+          # weirdness), we still want the deploy to proceed.
+          docker image prune -af || true
           docker compose --env-file /etc/tradingagents/env -f docker-compose.yml -f docker-compose.prod.yml pull
           docker compose --env-file /etc/tradingagents/env -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
-          docker image prune -f
+          docker image prune -af
           REMOTE
 
       - name: Smoke test
