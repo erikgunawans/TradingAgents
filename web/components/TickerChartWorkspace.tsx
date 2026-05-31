@@ -288,7 +288,7 @@ export default function TickerChartWorkspace({
       </header>
       {dataRangeClipped && (
         <p className="border-b border-amber-500/20 bg-amber-500/5 px-4 py-2 text-xs text-amber-200/80">
-          Hourly data limited to the last 60 days by the upstream provider.
+          {t("ticker.dataRangeClipped")}
         </p>
       )}
       <div ref={priceContainerRef} className="h-[420px]" />

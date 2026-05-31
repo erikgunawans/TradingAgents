@@ -144,6 +144,20 @@ export const en = {
     colRealizedReturn: "Realized return",
     intervalAria: "Chart interval",
     chartUnavailable: "Price data unavailable for this range — showing decisions below only.",
+    dataRangeClipped: "Hourly data limited to the last 60 days by the upstream provider.",
+  },
+
+  rating: {
+    Buy: "Buy",
+    Overweight: "Overweight",
+    Hold: "Hold",
+    Underweight: "Underweight",
+    Sell: "Sell",
+  },
+
+  decisionStatus: {
+    pending: "pending",
+    resolved: "resolved",
   },
 
   reportTabs: {
