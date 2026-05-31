@@ -296,6 +296,54 @@ def test_news_data_tools_honors_news_article_limit_config():
     )
 
 
+def test_news_analyst_prompt_carries_relevance_filter():
+    """The news_analyst system_message must instruct the LLM to filter
+    get_global_news output for relevance to the specific ticker — otherwise
+    Yahoo/Alpha-Vantage trending news (which is dominated by shoe-industry,
+    fashion-retail, and unrelated commodity stories at any given moment)
+    pads the 'global news' section of every report with content that has
+    nothing to do with the company.
+
+    Source-string inspection rather than behavioral test for the same
+    langchain_core dep-gap reason as the routing tests above (see PR #15
+    precedent in server/tests/test_worker_module_imports.py)."""
+    from pathlib import Path
+
+    src_path = (
+        Path(__file__).resolve().parent.parent
+        / "tradingagents"
+        / "agents"
+        / "analysts"
+        / "news_analyst.py"
+    )
+    src = src_path.read_text(encoding="utf-8")
+
+    # The instruction must use a recognizable filter marker. We pin
+    # 'RELEVANCE FILTER' as the canonical phrase a future contributor
+    # would search for; renaming it requires updating this test on
+    # purpose.
+    assert "RELEVANCE FILTER" in src, (
+        "news_analyst system_message must contain the 'RELEVANCE FILTER' "
+        "instruction so global_news output is ticker-filtered."
+    )
+
+    # Concrete by-example anti-pattern: a bank analysis must NOT include
+    # shoe-industry stories. Calling this out by name in the prompt teaches
+    # the LLM what 'irrelevant' means with a real failure mode we hit on
+    # 2026-05-31 (BMRI.JK report stuffed with Footwear News).
+    assert "shoe-industry" in src.lower(), (
+        "news_analyst prompt must call out shoe-industry as a concrete "
+        "anti-pattern — the real failure mode the relevance filter prevents."
+    )
+
+    # The 'no relevant news' permission keeps the LLM honest — without it,
+    # the model pads to look thorough.
+    assert "say so explicitly" in src.lower() or "rather than pad" in src.lower(), (
+        "news_analyst prompt must give the LLM permission to say 'no "
+        "relevant news' instead of padding the report with noise."
+    )
+
+
 def test_jk_benchmark_resolves_to_jkse():
     """Pin the .JK → ^JKSE mapping. Future config edits that drop or
     rename this entry will break alpha calculation for Indonesian
