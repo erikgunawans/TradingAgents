@@ -344,6 +344,75 @@ def test_news_analyst_prompt_carries_relevance_filter():
     )
 
 
+def test_lookup_company_name_returns_canonical_first_alias():
+    """Resolve IDX blue-chip tickers to their full company name. The first
+    entry in each _TICKER_ALIASES list is the canonical English name and
+    must round-trip here unchanged so prompts get clean, recognizable text."""
+    assert indonesia_news.lookup_company_name("BMRI.JK") == "Bank Mandiri"
+    assert indonesia_news.lookup_company_name("BBRI.JK") == "Bank Rakyat Indonesia"
+    assert indonesia_news.lookup_company_name("BBCA.JK") == "Bank Central Asia"
+    assert indonesia_news.lookup_company_name("BBNI.JK") == "Bank Negara Indonesia"
+    assert indonesia_news.lookup_company_name("TLKM.JK") == "Telkom Indonesia"
+    assert indonesia_news.lookup_company_name("ASII.JK") == "Astra International"
+    # Stem form (no suffix) resolves the same way — saves callers from
+    # having to strip the exchange suffix themselves.
+    assert indonesia_news.lookup_company_name("BMRI") == "Bank Mandiri"
+
+
+def test_lookup_company_name_returns_none_for_non_idx_tickers():
+    """Non-IDX tickers have no mapping and must return None so the caller
+    can keep its existing ticker-only context unchanged. This is by design:
+    NVDA/AAPL/etc. are unambiguous in the LLM's prior and don't need the hint."""
+    assert indonesia_news.lookup_company_name("NVDA") is None
+    assert indonesia_news.lookup_company_name("AAPL") is None
+    assert indonesia_news.lookup_company_name("XXXX.JK") is None  # unknown IDX
+    assert indonesia_news.lookup_company_name("BTC-USD") is None
+
+
+def test_lookup_company_name_case_insensitive():
+    """Tickers may arrive lowercase from form input — the mapping is
+    keyed on uppercase stems so the lookup must normalize."""
+    assert indonesia_news.lookup_company_name("bmri.jk") == "Bank Mandiri"
+    assert indonesia_news.lookup_company_name("bmri") == "Bank Mandiri"
+
+
+def test_build_instrument_context_wires_lookup_company_name():
+    """Source-string check: build_instrument_context (in agent_utils.py) must
+    import lookup_company_name and conditionally inject the company name into
+    its returned context string. Without this wiring, BMRI.JK shows up to the
+    LLM as just `BMRI.JK` and the model mis-maps it to BBRI ('bank BRI') in
+    its prose — observed on prod 2026-05-31.
+
+    Source-string inspection rather than behavioral test because importing
+    agent_utils triggers langchain_core (same gap as the news_data_tools
+    routing tests above)."""
+    from pathlib import Path
+
+    src_path = (
+        Path(__file__).resolve().parent.parent
+        / "tradingagents"
+        / "agents"
+        / "utils"
+        / "agent_utils.py"
+    )
+    src = src_path.read_text(encoding="utf-8")
+
+    # Must import the helper.
+    assert "from tradingagents.dataflows.indonesia_news import lookup_company_name" in src, (
+        "agent_utils.build_instrument_context must import lookup_company_name"
+    )
+    # Must call it with the ticker arg.
+    assert "lookup_company_name(ticker)" in src, (
+        "build_instrument_context must invoke lookup_company_name(ticker)"
+    )
+    # The result must be conditionally appended to the returned context —
+    # 'company_hint' is the canonical local name for the injected fragment.
+    assert "company_hint" in src, (
+        "build_instrument_context must produce a 'company_hint' fragment "
+        "from the lookup and inject it into the returned context string."
+    )
+
+
 def test_jk_benchmark_resolves_to_jkse():
     """Pin the .JK → ^JKSE mapping. Future config edits that drop or
     rename this entry will break alpha calculation for Indonesian

@@ -99,6 +99,30 @@ def _aliases_for(ticker: str) -> list[str]:
     return [stem] + _TICKER_ALIASES.get(stem, [])
 
 
+def lookup_company_name(ticker: str) -> str | None:
+    """Resolve a ticker to its canonical full company name, or None if unknown.
+
+    Currently covers the IDX LQ45 / blue-chip tickers in `_TICKER_ALIASES`.
+    By convention the first alias in each list is the canonical full name
+    (e.g. 'Bank Mandiri' for BMRI, 'Bank Central Asia' for BBCA). Returned
+    verbatim so the caller can drop it straight into a prompt:
+
+        >>> lookup_company_name("BMRI.JK")
+        'Bank Mandiri'
+        >>> lookup_company_name("NVDA")
+        None  # no IDX mapping; analyst agent falls back to ticker-only context
+
+    Why this matters: BMRI / BBRI / BBCA / BBNI are all 4-character tickers
+    starting with 'B' and an LLM (even a frontier one) will sometimes mis-map
+    BMRI to 'Bank BRI'. Injecting the canonical name into build_instrument_context
+    grounds the LLM on the right entity. Non-IDX tickers (NVDA, AAPL, etc.) are
+    unambiguous enough in the LLM's prior that the absence of a hint is fine.
+    """
+    stem = _strip_suffix(ticker)
+    aliases = _TICKER_ALIASES.get(stem)
+    return aliases[0] if aliases else None
+
+
 def _fetch_rss(url: str) -> bytes | None:
     """GET an RSS feed body. Returns None on any network/HTTP error.
 

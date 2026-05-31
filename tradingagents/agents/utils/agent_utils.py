@@ -61,15 +61,32 @@ def get_rating_language_instruction() -> str:
 
 
 def build_instrument_context(ticker: str, asset_type: str = "stock") -> str:
-    """Describe the exact instrument so agents preserve exchange-qualified tickers."""
+    """Describe the exact instrument so agents preserve exchange-qualified tickers.
+
+    For tickers with a canonical-name mapping (currently IDX blue chips via
+    indonesia_news.lookup_company_name), the full company name is injected
+    so the LLM doesn't confuse e.g. BMRI (Bank Mandiri) with BBRI (Bank BRI).
+    Non-IDX tickers stay ticker-only — the LLM's prior is reliable for
+    unambiguous global symbols (NVDA, AAPL, etc.).
+    """
+    # Lazy import to keep build_instrument_context callable in test
+    # environments where the full dataflows graph isn't loaded.
+    from tradingagents.dataflows.indonesia_news import lookup_company_name
+
     instrument_label = "asset" if asset_type == "crypto" else "instrument"
     extra_hint = (
         " Treat it as a crypto asset rather than a company, and do not assume company fundamentals are available."
         if asset_type == "crypto"
         else ""
     )
+    company_name = lookup_company_name(ticker) if asset_type != "crypto" else None
+    company_hint = (
+        f" This ticker refers to the company **{company_name}** — do not confuse it with similarly-named tickers."
+        if company_name
+        else ""
+    )
     return (
-        f"The {instrument_label} to analyze is `{ticker}`. "
+        f"The {instrument_label} to analyze is `{ticker}`.{company_hint} "
         "Use this exact ticker in every tool call, report, and recommendation, "
         "preserving any exchange suffix (e.g. `.TO`, `.L`, `.HK`, `.T`, `-USD`)."
         + extra_hint
