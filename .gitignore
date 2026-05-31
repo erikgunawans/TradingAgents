@@ -228,3 +228,4 @@ server/openapi.json
 # Local-only docker compose override (per-dev ports, AUTH_TRUST_HOST flag,
 # E2E_TEST_MODE bypass, etc.) — design §10 explicitly keeps this untracked.
 docker-compose.override.yml
+.gstack/
