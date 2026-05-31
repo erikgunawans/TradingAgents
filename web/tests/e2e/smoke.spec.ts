@@ -4,9 +4,16 @@ import { signInAs } from "./helpers";
 test("sign in via credentials provider and read a seeded run", async ({ page }) => {
   await signInAs(page, "e2e-user"); // seeded fixture user; waits for /history
 
-  await expect(page.getByText("NVDA")).toBeVisible();
+  // The seeded user is shared with launch-opt-in.spec / portfolio.spec /
+  // ticker-chart.spec, which can run in parallel workers; launch-opt-in
+  // also mutates this user's run list. Scope the click to the row Link
+  // (not any "NVDA" text node) and wait for the URL transition before
+  // asserting the heading.
+  const nvdaRow = page.getByRole("link").filter({ hasText: "NVDA" }).first();
+  await expect(nvdaRow).toBeVisible();
+  await nvdaRow.click();
+  await page.waitForURL(/\/history\/[a-f0-9-]+/);
 
-  await page.getByText("NVDA").first().click();
   await expect(page.getByRole("heading", { name: "NVDA", exact: true })).toBeVisible();
   await expect(page.getByText("2024-05-10")).toBeVisible();
   await expect(page.getByText("Market Analysis — NVDA")).toBeVisible();
