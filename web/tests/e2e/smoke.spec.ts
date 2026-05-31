@@ -1,18 +1,22 @@
 import { test, expect } from "@playwright/test";
 import { signInAs } from "./helpers";
 
+// Matches E2E_NVDA_RUN_ID in server/app/scripts/seed_e2e.py — the seeded
+// NVDA/2024-05-10 run for the e2e-user fixture. Hardcoding the UUID lets
+// this test navigate directly to the run-detail URL instead of clicking
+// through /history, which is shared mutable state racing with launch-opt-in.
+const SEEDED_NVDA_RUN_ID = "e2e0e2e0-0000-4000-8000-000000000002";
+
 test("sign in via credentials provider and read a seeded run", async ({ page }) => {
   await signInAs(page, "e2e-user"); // seeded fixture user; waits for /history
 
-  // The seeded user is shared with launch-opt-in.spec / portfolio.spec /
-  // ticker-chart.spec, which can run in parallel workers; launch-opt-in
-  // also mutates this user's run list. Scope the click to the row Link
-  // (not any "NVDA" text node) and wait for the URL transition before
-  // asserting the heading.
-  const nvdaRow = page.getByRole("link").filter({ hasText: "NVDA" }).first();
-  await expect(nvdaRow).toBeVisible();
-  await nvdaRow.click();
-  await page.waitForURL(/\/history\/[a-f0-9-]+/);
+  // Navigate directly to the seeded run rather than clicking through the
+  // /history list. Four specs share e2e-user, and the two that launch new
+  // runs (smoke test 2, launch-opt-in.spec.ts) can be mid-flight in the
+  // other Playwright worker — their server-action redirects re-render
+  // /history while this test's click is in flight, producing 'navigated
+  // to /history' click races. Direct navigation is immune.
+  await page.goto(`/history/${SEEDED_NVDA_RUN_ID}`);
 
   await expect(page.getByRole("heading", { name: "NVDA", exact: true })).toBeVisible();
   await expect(page.getByText("2024-05-10")).toBeVisible();

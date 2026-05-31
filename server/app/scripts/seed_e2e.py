@@ -37,6 +37,11 @@ from app.services.user_root import user_run_dir
 E2E_EMAIL = "e2e-user@e2e.local"
 E2E_GITHUB_ID = "e2e-user"
 E2E_USER_ID = uuid.UUID("e2e0e2e0-0000-4000-8000-000000000001")  # fixed, deterministic
+# Deterministic so smoke.spec.ts can navigate directly to /history/{this}
+# without going through the shared /history list — that list is mutated by
+# launch-opt-in.spec.ts running in a parallel worker against the same
+# e2e-user, which produced flaky 'navigated to /history' click races.
+E2E_NVDA_RUN_ID = uuid.UUID("e2e0e2e0-0000-4000-8000-000000000002")
 
 REPORTS = {
     "1_analysts/market.md": "# Market Analysis — NVDA\n\nSeeded e2e market report. Trend is constructive.\n",
@@ -92,7 +97,7 @@ async def _seed() -> None:
         results_path = user_run_dir(dashboard_dir, str(uid), "NVDA", "2024-05-10")
         if run is None:
             run = Run(
-                id=uuid.uuid4(),
+                id=E2E_NVDA_RUN_ID,
                 user_id=uid,
                 ticker="NVDA",
                 trade_date="2024-05-10",
