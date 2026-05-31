@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 AnalystKey = Literal["market", "social", "news", "fundamentals"]
 AssetType = Literal["stock", "crypto"]
 RunStatusLiteral = Literal["queued", "running", "succeeded", "failed"]
+Locale = Literal["en", "id"]
 
 
 class RunOut(BaseModel):
@@ -18,6 +19,7 @@ class RunOut(BaseModel):
     created_at: datetime
     completed_at: datetime | None
     triggered_by: str  # Wave 5.2; 'manual' (default) or 'monitor'
+    locale: str  # 'en' or 'id'; frozen at launch — report markdown is generated in this language
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -52,6 +54,7 @@ class RunCreate(BaseModel):
         max_length=4,
     )
     asset_type: AssetType = "stock"
+    locale: Locale = "en"
 
 
 class RunTailOut(BaseModel):

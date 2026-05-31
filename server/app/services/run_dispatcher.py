@@ -69,6 +69,7 @@ async def dispatch_run(
         results_path=str(target),
         created_at=datetime.now(timezone.utc),
         triggered_by=triggered_by,
+        locale=body.locale,
     )
     session.add(run)
     await session.commit()

@@ -42,6 +42,16 @@ def _session_factory_for_worker():
     return get_session_factory()()
 
 
+# Maps the wire-level locale code (the same one used by the web app's `lang`
+# cookie) to the language name that `get_language_instruction()` injects into
+# every report-producing agent's prompt. Keep this dict and web/lib/i18n/config
+# in sync.
+_LOCALE_TO_LANGUAGE: dict[str, str] = {
+    "en": "English",
+    "id": "Bahasa Indonesia",
+}
+
+
 def _build_config(run: Run) -> dict:
     """Build the TradingAgentsGraph config dict for a given Run."""
     from tradingagents.default_config import DEFAULT_CONFIG
@@ -57,6 +67,7 @@ def _build_config(run: Run) -> dict:
     cfg["quick_think_llm"] = settings.default_quick_think_llm
     cfg["max_debate_rounds"] = settings.default_max_debate_rounds
     cfg["max_risk_discuss_rounds"] = settings.default_max_risk_discuss_rounds
+    cfg["output_language"] = _LOCALE_TO_LANGUAGE.get(run.locale, "English")
     return cfg
 
 
