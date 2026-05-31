@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
 import type { AnalystKey } from "@/lib/types";
+import { getLocale } from "@/lib/i18n/server";
 
 export type LaunchFormError =
   | { kind: "validation"; message: string }
@@ -20,12 +21,18 @@ export async function launchRunAction(formData: FormData): Promise<LaunchFormErr
       a === "market" || a === "social" || a === "news" || a === "fundamentals"
   );
 
+  // Freeze the user's current language onto the run. The LLM-generated
+  // markdown is produced in this locale once and never re-translated; the
+  // chrome around it still switches via the lang cookie on later views.
+  const locale = await getLocale();
+
   let runId: string;
   try {
     const res = await api.createRun({
       ticker,
       trade_date,
       analysts: analysts.length ? analysts : undefined,
+      locale,
     });
     runId = res.run_id;
   } catch (e) {

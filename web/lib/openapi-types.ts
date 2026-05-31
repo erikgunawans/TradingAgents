@@ -432,6 +432,12 @@ export interface components {
              * @enum {string}
              */
             asset_type: "stock" | "crypto";
+            /**
+             * Locale
+             * @default en
+             * @enum {string}
+             */
+            locale: "en" | "id";
         };
         /** RunDetailOut */
         RunDetailOut: {
@@ -457,6 +463,8 @@ export interface components {
             completed_at: string | null;
             /** Triggered By */
             triggered_by: string;
+            /** Locale */
+            locale: string;
             /** Results Path */
             results_path: string;
             /** Error Summary */
@@ -492,6 +500,8 @@ export interface components {
             completed_at: string | null;
             /** Triggered By */
             triggered_by: string;
+            /** Locale */
+            locale: string;
         };
         /**
          * RunTailOut

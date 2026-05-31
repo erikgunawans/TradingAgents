@@ -43,3 +43,8 @@ class Run(Base):
     triggered_by: Mapped[str] = mapped_column(
         String(16), nullable=False, server_default="manual"
     )
+    # Frozen at launch — the LLM-generated report markdown is produced in
+    # this language and never re-translated. Old rows backfill to "en".
+    locale: Mapped[str] = mapped_column(
+        String(8), nullable=False, server_default="en"
+    )
