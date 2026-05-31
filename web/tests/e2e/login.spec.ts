@@ -5,7 +5,7 @@ test.describe("/login page", () => {
     await page.goto("/login");
 
     await expect(page.locator("h1")).toHaveText("Sign in");
-    await expect(page.getByText("tradingagents")).toBeVisible();
+    await expect(page.getByText("tradix")).toBeVisible();
     await expect(page.getByText("Continue with your preferred account")).toBeVisible();
 
     const githubButton = page.getByRole("button", { name: "Continue with GitHub" });
