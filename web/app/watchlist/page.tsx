@@ -9,7 +9,7 @@ import NotificationSection from "./NotificationSection";
 import QuickAddForm from "./QuickAddForm";
 import WatchlistTable from "./WatchlistTable";
 
-export const metadata = { title: "Watchlist · TradingAgents" };
+export const metadata = { title: "Watchlist · TradiX" };
 
 export default async function WatchlistPage() {
   const session = await auth();
